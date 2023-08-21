@@ -377,9 +377,10 @@ contract Sextillion is IERC20, Ownable, ReentrancyGuard {
     mapping(address => bool) public blackListed;
     mapping(address => bool) public whiteListed;
 
-    
-    uint256 public _marketing = 300; //  3%
-    uint256 public _lpFee = 200; // 2%
+    uint256 public buyTaxPercentage = 500; //  5
+    uint256 public sellTaxPercentage = 500; // 5 
+    uint256 public marketingTaxPercentage = 300; //  3%
+    uint256 public liquidityTaxPercentage = 200; // 2%
     uint256 public _marketingTotal;
     uint256 public _lpFeeTotal;
     address private  _marketingWallet  = 0x6d9166e17fF29ED8D496730862998024964d16E6;    
@@ -387,8 +388,8 @@ contract Sextillion is IERC20, Ownable, ReentrancyGuard {
     address public burningAddress = 0x0000000000000000000000000000000000000000;  
     address public lpAddress ;  // will set after creating pool  
 
-    uint256 public _maxTxAmount = 730000000000000000000 * 10**_decimals;
-    uint256 public _maxWalletSize = 730000000000000000000 * 10**_decimals;           
+    uint256 public _maxTxAmount =  _totalSupply / 100; 
+    uint256 public _maxWalletSize = _totalSupply / 100;           
        
     
 
@@ -526,8 +527,11 @@ contract Sextillion is IERC20, Ownable, ReentrancyGuard {
     function BuycollectFee(address account, uint256 amount) private returns (uint256) {
         
         uint256 transferAmount = amount;
-        uint256 _marketingFee = amount.mul(_marketing).div(10000);
-        uint256 lpFee = amount.mul(_lpFee).div(10000);
+        uint256 _marketingFeeCollect = buyTaxPercentage.sub(liquidityTaxPercentage);
+        uint256 lpFeeCollect = buyTaxPercentage.sub(marketingTaxPercentage);
+
+      uint256 _marketingFee = amount.mul(_marketingFeeCollect).div(10000);
+        uint256 lpFee = amount.mul(lpFeeCollect).div(10000);
      
 
         if (lpFee > 0){
@@ -550,9 +554,12 @@ contract Sextillion is IERC20, Ownable, ReentrancyGuard {
 
     function SellBuycollectFee(address account, uint256 amount) private  returns (uint256) {
         
-        uint256 transferAmount = amount;
-        uint256 _marketingFee = amount.mul(_marketing).div(10000);
-        uint256 lpFee = amount.mul(_lpFee).div(10000);
+       uint256 transferAmount = amount;
+        uint256 _marketingFeeCollect = buyTaxPercentage.sub(liquidityTaxPercentage);
+        uint256 lpFeeCollect = buyTaxPercentage.sub(marketingTaxPercentage);
+
+      uint256 _marketingFee = amount.mul(_marketingFeeCollect).div(10000);
+        uint256 lpFee = amount.mul(lpFeeCollect).div(10000);
      
 
         if (lpFee > 0){
@@ -619,11 +626,11 @@ contract Sextillion is IERC20, Ownable, ReentrancyGuard {
     }
     
     function set_marketingFee(uint256 fee) public onlyOwner {
-        _marketing = fee;
+        marketingTaxPercentage = fee;
     }
 
     function setlpFee(uint256 fee) public onlyOwner {
-        _lpFee = fee;
+        liquidityTaxPercentage = fee;
     }
 
     function set_marketingWallet(address _Address) public onlyOwner {
