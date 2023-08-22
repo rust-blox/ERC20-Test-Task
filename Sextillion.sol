@@ -364,7 +364,7 @@ contract Sextillion is IERC20, Ownable, ReentrancyGuard {
 
     string private _name = "sextillion";
     string private _symbol = "SXT";
-    uint8 private _decimals = 18;
+    uint8 private _decimals = 21;
 
     address public contractAddress;
     
